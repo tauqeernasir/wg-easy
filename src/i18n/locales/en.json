@@ -113,7 +113,13 @@
     "hooks": "Hooks",
     "hooksDescription": "Hooks only work with wg-quick",
     "hooksLeaveEmpty": "Only for wg-quick. Otherwise, leave it empty",
-    "dnsDesc": "DNS server clients will use (overrides global config)"
+    "dnsDesc": "DNS server clients will use (overrides global config)",
+    "limitWarning": "Approaching Client Limit",
+    "remainingClients": "{count} client(s) remaining",
+    "limitReached": "Client limit reached",
+    "limitReachedDesc": "The maximum number of clients has been reached. Please contact your administrator to increase the limit or remove unused clients.",
+    "limitReachedTooltip": "Cannot create more clients - limit reached",
+    "clientsCount": "{current}/{max} clients"
   },
   "dialog": {
     "change": "Change",
@@ -139,13 +145,24 @@
     "general": {
       "sessionTimeout": "Session Timeout",
       "sessionTimeoutDesc": "Session duration for Remember Me (seconds)",
+      "userAccounts": "User Accounts",
+      "currentUsers": "Current Users",
+      "maxUsers": "Maximum Users",
+      "unlimited": "Unlimited",
+      "userLimitReached": "Maximum number of user accounts has been reached. Cannot create new users.",
+      "usersRemaining": "{count} user account(s) remaining",
       "metrics": "Metrics",
       "metricsPassword": "Password",
       "metricsPasswordDesc": "Bearer Password for the metrics endpoint (password or argon2 hash)",
       "json": "JSON",
       "jsonDesc": "Route for metrics in JSON format",
       "prometheus": "Prometheus",
-      "prometheusDesc": "Route for Prometheus metrics"
+      "prometheusDesc": "Route for Prometheus metrics",
+      "clientLimits": "Client Limits",
+      "currentClients": "Current Clients",
+      "maxClients": "Maximum Clients",
+      "clientLimitReached": "Maximum number of client accounts has been reached. Cannot create new clients.",
+      "clientsRemaining": "{count} client account(s) remaining"
     },
     "config": {
       "connection": "Connection",

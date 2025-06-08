@@ -54,6 +54,7 @@ ENV PORT=51821
 ENV HOST=0.0.0.0
 ENV INSECURE=false
 ENV INIT_ENABLED=false
+ENV MAX_USER_ACCOUNTS=0
 
 LABEL org.opencontainers.image.source=https://github.com/wg-easy/wg-easy
 

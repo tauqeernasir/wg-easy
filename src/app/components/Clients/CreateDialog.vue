@@ -1,5 +1,5 @@
 <template>
-  <BaseDialog :trigger-class="triggerClass">
+  <BaseDialog :trigger-class="triggerClass" v-model:open="dialogOpen">
     <template #trigger>
       <slot />
     </template>
@@ -8,6 +8,23 @@
     </template>
     <template #description>
       <div class="flex flex-col">
+        <!-- Show limit warning if approaching limit -->
+        <div 
+          v-if="stats?.maxClients > 0 && stats?.remaining <= 3 && stats?.remaining > 0"
+          class="mb-4 rounded-md bg-yellow-50 p-3 border border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800"
+        >
+          <div class="flex">
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                {{ $t('client.limitWarning') }}
+              </h3>
+              <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                <p>{{ $t('client.remainingClients', { count: stats.remaining }) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <FormTextField id="name" v-model="name" :label="$t('client.name')" />
         <FormDateField
           id="expiresAt"
@@ -21,7 +38,10 @@
         <BaseSecondaryButton>{{ $t('dialog.cancel') }}</BaseSecondaryButton>
       </DialogClose>
       <DialogClose as-child>
-        <BasePrimaryButton @click="createClient">
+        <BasePrimaryButton 
+          @click="createClient"
+          :disabled="!canCreate"
+        >
           {{ $t('client.create') }}
         </BasePrimaryButton>
       </DialogClose>
@@ -32,13 +52,26 @@
 <script lang="ts" setup>
 const name = ref<string>('');
 const expiresAt = ref<string | null>(null);
+const dialogOpen = ref(false);
 const clientsStore = useClientsStore();
 
 const { t } = useI18n();
 
 defineProps<{ triggerClass?: string }>();
 
+// Fetch client statistics
+const { data: stats, refresh: refreshStats } = await useFetch('/api/client/stats', {
+  method: 'get',
+});
+
+const canCreate = computed(() => {
+  return stats.value?.canCreateMore ?? true;
+});
+
 function createClient() {
+  if (!canCreate.value) {
+    return;
+  }
   return _createClient({ name: name.value, expiresAt: expiresAt.value });
 }
 
@@ -48,8 +81,24 @@ const _createClient = useSubmit(
     method: 'post',
   },
   {
-    revert: () => clientsStore.refresh(),
+    revert: async (success) => {
+      await clientsStore.refresh();
+      await refreshStats();
+      if (success) {
+        // Reset form
+        name.value = '';
+        expiresAt.value = null;
+        dialogOpen.value = false;
+      }
+    },
     successMsg: t('client.created'),
   }
 );
+
+// Watch dialog open state to refresh stats
+watch(dialogOpen, (isOpen) => {
+  if (isOpen) {
+    refreshStats();
+  }
+});
 </script>

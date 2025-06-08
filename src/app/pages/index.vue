@@ -3,9 +3,33 @@
     <Panel>
       <PanelHead>
         <PanelHeadTitle :text="$t('pages.clients')" />
+        <!-- Client Statistics -->
+        <div 
+          v-if="stats && stats.maxClients > 0" 
+          class="flex items-center text-sm text-gray-600 dark:text-gray-300 mr-4"
+        >
+          <span class="mr-4">
+            {{ $t('client.clientsCount', { 
+              current: stats.currentClients, 
+              max: stats.maxClients 
+            }) }}
+          </span>
+          <span 
+            v-if="stats.remaining > 0"
+            class="text-green-600 dark:text-green-400"
+          >
+            {{ $t('client.remainingClients', { count: stats.remaining }) }}
+          </span>
+          <span 
+            v-else
+            class="text-red-600 dark:text-red-400 font-medium"
+          >
+            {{ $t('client.limitReached') }}
+          </span>
+        </div>
         <PanelHeadBoat>
           <ClientsSort />
-          <ClientsNew />
+          <ClientsNew :disabled="stats && !stats.canCreateMore" />
         </PanelHeadBoat>
       </PanelHead>
 
@@ -34,21 +58,25 @@ authStore.update();
 const globalStore = useGlobalStore();
 const clientsStore = useClientsStore();
 
-// TODO?: use hover card to show more detailed info without leaving the page
-// or do something like a accordion
+// Fetch client statistics
+const { data: stats, refresh: refreshStats } = await useFetch('/api/client/stats', {
+  method: 'get',
+});
 
 const intervalId = ref<NodeJS.Timeout | null>(null);
 
 clientsStore.refresh();
 
 onMounted(() => {
-  // TODO?: replace with websocket or similar
   intervalId.value = setInterval(() => {
     clientsStore
       .refresh({
         updateCharts: globalStore.uiShowCharts,
       })
       .catch(console.error);
+    
+    // Refresh stats less frequently
+    refreshStats().catch(console.error);
   }, 1000);
 });
 

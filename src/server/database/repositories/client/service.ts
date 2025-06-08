@@ -77,6 +77,11 @@ export class ClientService {
 
     return this.#db.transaction(async (tx) => {
       const clients = await tx.query.client.findMany().execute();
+      
+      if (WG_ENV.MAX_USER_ACCOUNTS > 0 && clients.length >= WG_ENV.MAX_USER_ACCOUNTS) {
+        throw new Error(`Maximum number of client accounts (${WG_ENV.MAX_USER_ACCOUNTS}) has been reached`);
+      }
+      
       const clientInterface = await tx.query.wgInterface
         .findFirst({
           where: eq(wgInterface.name, 'wg0'),
@@ -165,6 +170,12 @@ export class ClientService {
     privateKey,
     publicKey,
   }: ClientCreateFromExistingType) {
+    const existingClients = await this.#db.query.client.findMany().execute();
+    
+    if (WG_ENV.MAX_USER_ACCOUNTS > 0 && existingClients.length >= WG_ENV.MAX_USER_ACCOUNTS) {
+      throw new Error(`Maximum number of client accounts (${WG_ENV.MAX_USER_ACCOUNTS}) has been reached`);
+    }
+
     const clientConfig = await Database.userConfigs.get();
 
     return this.#db

@@ -8,6 +8,8 @@ services:
     #  - PORT=51821
     #  - HOST=0.0.0.0
     #  - INSECURE=false
+    environment:
+      - MAX_USER_ACCOUNTS=0 # 0 = unlimited, set to a number to limit users
 
     image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy

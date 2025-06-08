@@ -17,6 +17,10 @@ export const WG_ENV = {
   INSECURE: process.env.INSECURE === 'true',
   /** Port the UI is listening on */
   PORT: assertEnv('PORT'),
+  /** Maximum number of user accounts allowed (0 = unlimited) */
+  MAX_USER_ACCOUNTS: process.env.MAX_USER_ACCOUNTS 
+    ? Number.parseInt(process.env.MAX_USER_ACCOUNTS, 10) 
+    : 0,
 };
 
 export const WG_INITIAL_ENV = {
