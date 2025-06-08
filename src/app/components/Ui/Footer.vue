@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <!-- <footer>
     <p class="m-10 text-center text-xs text-gray-300 dark:text-neutral-600">
       <a
         class="hover:underline"
@@ -28,8 +28,8 @@
         target="_blank"
         >{{ $t('layout.donate') }}</a
       >
-    </p>
-  </footer>
+    </p>  
+  </footer> -->
 </template>
 
 <script lang="ts" setup>

@@ -15,7 +15,7 @@
         </p>
       </div>
       
-      <ClientsCreateDialog v-else>
+      <ClientsCreateDialog v-else :disabled="stats && !stats.canCreateMore">
         <BaseSecondaryButton as="span">
           <IconsPlus class="w-4 md:mr-2" />
           <span class="text-sm">{{ $t('client.new') }}</span>

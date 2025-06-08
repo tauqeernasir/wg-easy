@@ -1,10 +1,11 @@
 <template>
-  <ClientsCreateDialog>
+  <ClientsCreateDialog :disabled="disabled">
     <BaseSecondaryButton 
       as="span"
       :disabled="disabled"
       :class="{
         'opacity-50 cursor-not-allowed': disabled,
+        'pointer-events-none': disabled,
       }"
       :title="disabled ? $t('client.limitReachedTooltip') : undefined"
     >

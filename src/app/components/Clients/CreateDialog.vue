@@ -1,7 +1,9 @@
 <template>
   <BaseDialog :trigger-class="triggerClass" v-model:open="dialogOpen">
     <template #trigger>
-      <slot />
+      <div @click="handleTriggerClick">
+        <slot />
+      </div>
     </template>
     <template #title>
       {{ $t('client.new') }}
@@ -57,7 +59,10 @@ const clientsStore = useClientsStore();
 
 const { t } = useI18n();
 
-defineProps<{ triggerClass?: string }>();
+const props = defineProps<{ 
+  triggerClass?: string;
+  disabled?: boolean;
+}>();
 
 // Fetch client statistics
 const { data: stats, refresh: refreshStats } = await useFetch('/api/client/stats', {
@@ -67,6 +72,15 @@ const { data: stats, refresh: refreshStats } = await useFetch('/api/client/stats
 const canCreate = computed(() => {
   return stats.value?.canCreateMore ?? true;
 });
+
+function handleTriggerClick(event: Event) {
+  // Prevent dialog from opening if disabled
+  if (props.disabled || !canCreate.value) {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
+}
 
 function createClient() {
   if (!canCreate.value) {
@@ -97,8 +111,21 @@ const _createClient = useSubmit(
 
 // Watch dialog open state to refresh stats
 watch(dialogOpen, (isOpen) => {
-  if (isOpen) {
+  if (isOpen && canCreate.value) {
     refreshStats();
+  }
+});
+
+// Prevent dialog from opening when disabled
+watch(() => props.disabled, (isDisabled) => {
+  if (isDisabled && dialogOpen.value) {
+    dialogOpen.value = false;
+  }
+});
+
+watch(() => stats.value?.canCreateMore, (canCreateMore) => {
+  if (canCreateMore === false && dialogOpen.value) {
+    dialogOpen.value = false;
   }
 });
 </script>
